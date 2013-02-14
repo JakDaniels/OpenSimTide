@@ -38,5 +38,10 @@ below:
     tide_level_channel = 5556
 
 
+To add this module to your OpenSim, change into your ~/opensim/addon-modules
+directory and type:
+git clone https://github.com/JakDaniels/OpenSimTide.git
+
+Rerun the prebuild script in the opensim directory and rebuild with nant
 
 If you have any question please contact Jak Daniels, jak@ateb.co.uk
