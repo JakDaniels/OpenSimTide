@@ -1,0 +1,125 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+	<PropertyGroup>
+	  <ProjectType>Local</ProjectType>
+	  <ProductVersion>9.0.21022</ProductVersion>
+	  <SchemaVersion>2.0</SchemaVersion>
+	  <ProjectGuid>{659D4DDC-0000-0000-0000-000000000000}</ProjectGuid>
+	  <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	  <ApplicationIcon></ApplicationIcon>
+	  <AssemblyKeyContainerName>
+	  </AssemblyKeyContainerName>
+	  <AssemblyName>OpenSimTide.Modules</AssemblyName>
+	  <DefaultClientScript>JScript</DefaultClientScript>
+	  <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+	  <DefaultTargetSchema>IE50</DefaultTargetSchema>
+	  <DelaySign>false</DelaySign>
+	  <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+	  <OutputType>Library</OutputType>
+	  <AppDesignerFolder></AppDesignerFolder>
+	  <RootNamespace>OpenSimTide.Modules</RootNamespace>
+	  <StartupObject></StartupObject>
+	  <StartArguments></StartArguments>
+	  <FileUpgradeFlags>
+	  </FileUpgradeFlags>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	  <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+	  <BaseAddress>285212672</BaseAddress>
+	  <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+	  <ConfigurationOverrideFile>
+	  </ConfigurationOverrideFile>
+	  <DefineConstants>TRACE;DEBUG</DefineConstants>
+	  <DocumentationFile></DocumentationFile>
+	  <DebugSymbols>True</DebugSymbols>
+	  <FileAlignment>4096</FileAlignment>
+	  <Optimize>False</Optimize>
+	  <OutputPath>../../../bin/</OutputPath>
+	  <RegisterForComInterop>False</RegisterForComInterop>
+	  <RemoveIntegerChecks>False</RemoveIntegerChecks>
+	  <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+	  <WarningLevel>4</WarningLevel>
+	  <NoStdLib>False</NoStdLib>
+	  <NoWarn></NoWarn>
+	  <PlatformTarget>AnyCPU</PlatformTarget>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	  <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+	  <BaseAddress>285212672</BaseAddress>
+	  <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+	  <ConfigurationOverrideFile>
+	  </ConfigurationOverrideFile>
+	  <DefineConstants>TRACE</DefineConstants>
+	  <DocumentationFile></DocumentationFile>
+	  <DebugSymbols>False</DebugSymbols>
+	  <FileAlignment>4096</FileAlignment>
+	  <Optimize>True</Optimize>
+	  <OutputPath>../../../bin/</OutputPath>
+	  <RegisterForComInterop>False</RegisterForComInterop>
+	  <RemoveIntegerChecks>False</RemoveIntegerChecks>
+	  <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+	  <WarningLevel>4</WarningLevel>
+	  <NoStdLib>False</NoStdLib>
+	  <NoWarn></NoWarn>
+	  <PlatformTarget>AnyCPU</PlatformTarget>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Reference Include="log4net" >
+		  <Name>log4net</Name>
+		<Private>False</Private>
+	  </Reference>
+	  <Reference Include="Mono.Addins" >
+		  <Name>Mono.Addins</Name>
+		<Private>False</Private>
+	  </Reference>
+	  <Reference Include="Nini" >
+		  <Name>Nini</Name>
+		<Private>False</Private>
+	  </Reference>
+	  <Reference Include="OpenMetaverse" >
+		  <Name>OpenMetaverse</Name>
+		<Private>False</Private>
+	  </Reference>
+	  <Reference Include="OpenMetaverse.StructuredData" >
+		  <Name>OpenMetaverse.StructuredData</Name>
+		<Private>False</Private>
+	  </Reference>
+	  <Reference Include="OpenMetaverseTypes" >
+		  <Name>OpenMetaverseTypes</Name>
+		<Private>False</Private>
+	  </Reference>
+	  <Reference Include="System" >
+		  <Name>System</Name>
+		<Private>False</Private>
+	  </Reference>
+	  <Reference Include="System.Net" >
+		  <Name>System.Net</Name>
+		<Private>False</Private>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="../../../OpenSim/Framework/OpenSim.Framework.csproj">
+		<Name>OpenSim.Framework</Name>
+		<Project>{7404933D-0000-0000-0000-000000000000}</Project>
+		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+		<Private>False</Private>
+	  </ProjectReference>
+	  <ProjectReference Include="../../../OpenSim/Region/Framework/OpenSim.Region.Framework.csproj">
+		<Name>OpenSim.Region.Framework</Name>
+		<Project>{9169B545-0000-0000-0000-000000000000}</Project>
+		<Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+		<Private>False</Private>
+	  </ProjectReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Include="TideModule\TideModule.cs">
+		<SubType>Code</SubType>
+	  </Compile>
+  </ItemGroup>
+	<Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
+	<PropertyGroup>
+	  <PreBuildEvent>
+	  </PreBuildEvent>
+	  <PostBuildEvent>
+	  </PostBuildEvent>
+	</PropertyGroup>
+</Project>
