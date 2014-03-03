@@ -222,8 +222,8 @@ namespace TideModule
             {
                 if (m_tideInfoBroadcast && m_tideDirection)
                 {
-                    m_scene.SimChat(Utils.StringToBytes(tideLevelMsg), ChatTypeEnum.Region, m_tideInfoChannel, m_shoutPos, "TIDE", UUID.Zero, false);
-                    m_scene.SimChat(Utils.StringToBytes(m_tideLevel.ToString()), ChatTypeEnum.Region, m_tideLevelChannel, m_shoutPos, "TIDE", UUID.Zero, false);
+                    m_scene.SimChatBroadcast(Utils.StringToBytes(tideLevelMsg), ChatTypeEnum.Region, m_tideInfoChannel, m_shoutPos, "TIDE", UUID.Zero, false);
+                    m_scene.SimChatBroadcast(Utils.StringToBytes(m_tideLevel.ToString()), ChatTypeEnum.Region, m_tideLevelChannel, m_shoutPos, "TIDE", UUID.Zero, false);
                 }   
                 if (m_tideInfoDebug) m_log.InfoFormat("[TIDE] Updating Region: {0}", m_scene.RegionInfo.RegionName);
                 m_scene.RegionInfo.RegionSettings.WaterHeight = m_tideLevel;
@@ -231,8 +231,8 @@ namespace TideModule
                 m_scene.EventManager.TriggerTerrainTick();
                 if (m_tideInfoBroadcast && !m_tideDirection)
                 {
-                    m_scene.SimChat(Utils.StringToBytes(tideLevelMsg), ChatTypeEnum.Region, m_tideInfoChannel, m_shoutPos, "TIDE", UUID.Zero, false);
-                    m_scene.SimChat(Utils.StringToBytes(m_tideLevel.ToString()), ChatTypeEnum.Region, m_tideLevelChannel, m_shoutPos, "TIDE", UUID.Zero, false);
+                    m_scene.SimChatBroadcast(Utils.StringToBytes(tideLevelMsg), ChatTypeEnum.Region, m_tideInfoChannel, m_shoutPos, "TIDE", UUID.Zero, false);
+                    m_scene.SimChatBroadcast(Utils.StringToBytes(m_tideLevel.ToString()), ChatTypeEnum.Region, m_tideLevelChannel, m_shoutPos, "TIDE", UUID.Zero, false);
                 }
             }
 
