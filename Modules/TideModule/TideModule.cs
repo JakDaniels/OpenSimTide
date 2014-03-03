@@ -165,10 +165,7 @@ namespace TideModule
             double tideRange;
             double tideMiddle;
             string tideLevelMsg;
-            int sx;
-            int sy;
-            
-            
+           
         	if (((m_frame++ % m_frameUpdateRate) != 0) || !m_ready) {
                 return;
             }
