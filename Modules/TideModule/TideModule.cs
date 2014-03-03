@@ -234,8 +234,8 @@ namespace TideModule
                 m_scene.EventManager.TriggerTerrainTick();
                 if (m_tideInfoBroadcast && !m_tideDirection)
                 {
-                    m_scene.SimChatBroadcast(Utils.StringToBytes(tideLevelMsg), ChatTypeEnum.Region, m_tideInfoChannel, shoutPos, "TIDE", UUID.Zero, false);
-                    m_scene.SimChatBroadcast(Utils.StringToBytes(m_tideLevel.ToString()), ChatTypeEnum.Region, m_tideLevelChannel, shoutPos, "TIDE", UUID.Zero, false);
+                    m_scene.SimChat(Utils.StringToBytes(tideLevelMsg), ChatTypeEnum.Region, m_tideInfoChannel, m_shoutPos, "TIDE", UUID.Zero, false);
+                    m_scene.SimChat(Utils.StringToBytes(m_tideLevel.ToString()), ChatTypeEnum.Region, m_tideLevelChannel, m_shoutPos, "TIDE", UUID.Zero, false);
                 }
             }
 
