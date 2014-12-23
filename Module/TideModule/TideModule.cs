@@ -13,19 +13,23 @@ using OpenSim.Region.Framework.Scenes;
 using OpenMetaverse;
 using Mono.Addins;
 
-[assembly: Addin("TideModule", "0.1")]
+[assembly: Addin("OpenSimTide", "0.2")]
 [assembly: AddinDependency("OpenSim", "0.5")]
 
 namespace TideModule
 {
-    [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule")]
-    public class AvatarServicesModule : ISharedRegionModule
+    [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule", Id = "OpenSimTide")]
+    public class OpenSimTide : INonSharedRegionModule
     {
         #region Fields
         private static readonly ILog m_log = LogManager.GetLogger (MethodBase.GetCurrentMethod ().DeclaringType);
+
+        public string Name { get { return m_name; } }
+        public Type ReplaceableInterface { get { return null; } }
+
         private const int TICKS_PER_SECOND = 10000000;
 
-        public string m_name = "TideModule";
+        public string m_name = "OpenSimTide";
         private uint m_frame = 0;
         private int m_frameUpdateRate = 100;
         private bool m_enabled = false;
@@ -44,113 +48,101 @@ namespace TideModule
         private int m_tideInfoChannel = 5555; //chat channel for all tide info
         private int m_tideLevelChannel = 5556; //chat channel for just the tide level in m
         private int m_tideAnnounceCount = 5; //how many times do we announce the turning tide
-    
-        private Dictionary<string, Scene> m_scenel = new Dictionary<string, Scene> ();
+        private int m_tideAnnounceCounter = 0; //counter we use to count announcements of low or high tide
+        private string m_tideAnnounceMsg = "";
 
+        public Scene m_scene;
         public IConfigSource m_config;
-        public Scene m_world;
         public RegionInfo m_regionInfo;
         public Dictionary<string, Scene> mScene = new Dictionary<string, Scene> ();
         public Vector3 m_shoutPos = new Vector3(128f, 128f, 30f);
-        private int m_tideAnnounceCounter = 0; //counter we use to count announcements of low or high tide
-        private string m_tideAnnounceMsg = "";
-        #endregion
-
-        #region ISharedRegionModule implementation
-        public void PostInitialise ()
-        {
-        }
 
         #endregion
+
 
         #region IRegionModuleBase implementation
         public void Initialise (IConfigSource source)
         {
             m_config = source;
-            IConfig cnf = source.Configs["Tide"];
-            
-            if (cnf == null)
-            {
-                m_enabled = false;
-                m_log.Info ("[TIDE]: No Configuration Found, Disabled");
-                return;
-            }
-            m_enabled = cnf.GetBoolean("enabled", false);
-            m_frameUpdateRate = cnf.GetInt("tide_update_rate", 150);
-            m_lowTide = cnf.GetFloat("tide_low_water", 18.0f);
-            m_highTide = cnf.GetFloat("tide_high_water", 22.0f);
-            m_cycleTime = (ulong) cnf.GetInt("tide_cycle_time", 3600);
-            m_tideInfoDebug = cnf.GetBoolean("tide_info_debug", false);
-            m_tideInfoBroadcast = cnf.GetBoolean("tide_info_broadcast", true);
-            m_tideInfoChannel = cnf.GetInt("tide_info_channel", 5555);
-            m_tideLevelChannel = cnf.GetInt("tide_level_channel", 5556);
-            m_tideAnnounceCount = cnf.GetInt("tide_announce_count", 5);
- 
-            if (m_enabled)
-            {
-                m_log.InfoFormat("[TIDE] Enabled with an update rate of {0} frames, Low Water={1}m, High Water={2}m, Cycle Time={3} secs", m_frameUpdateRate, m_lowTide, m_highTide,m_cycleTime);
-            	m_frame = 0;
-
-            	// Mark Module Ready for duty
-              	m_ready = true;
-				return;	
-			}						
         }
 
 
         public void Close ()
         {
             if (m_enabled) {
-                m_ready = false;
-                foreach (Scene m_scene in m_scenel.Values)
-                {
                     m_scene.EventManager.OnFrame -= TideUpdate;
-                }
             }
         }
 
 
         public void AddRegion (Scene scene)
         {
-            m_log.InfoFormat ("[TIDE]: Adding {0}", scene.RegionInfo.RegionName);
-            if (m_enabled == true) {
-                if (m_scenel.ContainsKey(scene.RegionInfo.RegionName)) {
-                    m_scenel[scene.RegionInfo.RegionName] = scene;
-                    m_shoutPos = new Vector3(scene.RegionInfo.RegionSizeX / 2f, scene.RegionInfo.RegionSizeY / 2f, 30f);
-                } else {
-                    m_scenel.Add(scene.RegionInfo.RegionName, scene);
-                    scene.EventManager.OnFrame += TideUpdate;
-                }
+            m_log.InfoFormat("[TIDE]: Adding Region '{0}' to this module", scene.RegionInfo.RegionName);
+            
+            string moduleConfigFile = Path.Combine(Util.configDir(), "../addon-modules/" + m_name + "/config/" + m_name + ".ini");
+            m_log.InfoFormat("[TIDE]: Loading from config file {0}", moduleConfigFile);
+            try
+            {
+                m_config = new IniConfigSource(moduleConfigFile);
+            }
+            catch (Exception )
+            {
+                m_log.InfoFormat("[TIDE]: No module config file '{0}' was found! Tide in this region is set to Disabled",  moduleConfigFile);
+                m_enabled = false;
+                m_config = null;
+                return;
+            }
+            IConfig cnf = m_config.Configs[scene.RegionInfo.RegionName];
+            
+            if(cnf == null)
+            {
+                m_log.InfoFormat("[TIDE]: No Region section [{0}] found in config file {1}. Tide in this region is set to Disabled", scene.RegionInfo.RegionName, moduleConfigFile);
+                m_enabled = false;
+                return;
+            }
+              
+            m_enabled = cnf.GetBoolean("TideEnabled", false);
+            
+            if (m_enabled)
+            {
+                m_frameUpdateRate = cnf.GetInt("TideUpdateRate", 150);
+                m_lowTide = cnf.GetFloat("TideLowWater", 18.0f);
+                m_highTide = cnf.GetFloat("TideHighWater", 22.0f);
+                m_cycleTime = (ulong)cnf.GetInt("TideCycleTime", 3600);
+                m_tideInfoDebug = cnf.GetBoolean("TideInfoDebug", false);
+                m_tideInfoBroadcast = cnf.GetBoolean("TideInfoBroadcast", true);
+                m_tideInfoChannel = cnf.GetInt("TideInfoChannel", 5555);
+                m_tideLevelChannel = cnf.GetInt("TideLevelChannel", 5556);
+                m_tideAnnounceCount = cnf.GetInt("TideAnnounceCount", 5);
+                
+                m_log.InfoFormat("[TIDE]: Enabled with an update rate every {0} frames, Low Water={1}m, High Water={2}m, Cycle Time={3} secs", m_frameUpdateRate, m_lowTide, m_highTide, m_cycleTime);
+                m_log.InfoFormat("[TIDE]: Info Channel={0}, Water Level Channel={1}, Info Broadcast is {2}, Announce Count={3}", m_tideInfoChannel, m_tideLevelChannel, m_tideInfoBroadcast, m_tideAnnounceCounter);
+
+                m_frame = 0;
+                m_ready = true; // Mark Module Ready for duty
+                m_shoutPos = new Vector3(scene.RegionInfo.RegionSizeX / 2f, scene.RegionInfo.RegionSizeY / 2f, 30f);
+                scene.EventManager.OnFrame += TideUpdate;
+                m_scene = scene;
+            }
+            else
+            {
+                m_log.InfoFormat("[TIDE]: Tide in this region is set to Disabled", scene.RegionInfo.RegionName);
             }
         }
 
-
         public void RemoveRegion (Scene scene)
         {
-            if (m_scenel.ContainsKey(scene.RegionInfo.RegionName)) {
-                lock (m_scenel) {
-                    m_scenel.Remove(scene.RegionInfo.RegionName);
-                }
+            m_log.InfoFormat("[TIDE]: Removing Region '{0}' from this module", scene.RegionInfo.RegionName);
+            if (m_enabled)
+            {
+                scene.EventManager.OnFrame -= TideUpdate;
             }
-            scene.EventManager.OnFrame -= TideUpdate;
         }
 
 
         public void RegionLoaded (Scene scene)
         {
-            if (m_enabled == false)
-                return;
 
-        }
-
-
-        public string Name {
-            get { return m_name; }
-        }
-
-
-        public Type ReplaceableInterface {
-            get { return null; }
         }
 
         #endregion
@@ -217,25 +209,24 @@ namespace TideModule
                 }
             }
 
-            if (m_tideInfoDebug) m_log.InfoFormat("[TIDE] Sea Level currently at {0}m", m_tideLevel);
-            foreach (Scene m_scene in m_scenel.Values)
-            {
-                if (m_tideInfoBroadcast && m_tideDirection)
-                {
-                    m_scene.SimChatBroadcast(Utils.StringToBytes(tideLevelMsg), ChatTypeEnum.Region, m_tideInfoChannel, m_shoutPos, "TIDE", UUID.Zero, false);
-                    m_scene.SimChatBroadcast(Utils.StringToBytes(m_tideLevel.ToString()), ChatTypeEnum.Region, m_tideLevelChannel, m_shoutPos, "TIDE", UUID.Zero, false);
-                }   
-                if (m_tideInfoDebug) m_log.InfoFormat("[TIDE] Updating Region: {0}", m_scene.RegionInfo.RegionName);
-                m_scene.RegionInfo.RegionSettings.WaterHeight = m_tideLevel;
-                m_scene.EventManager.TriggerRequestChangeWaterHeight(m_tideLevel);
-                m_scene.EventManager.TriggerTerrainTick();
-                if (m_tideInfoBroadcast && !m_tideDirection)
-                {
-                    m_scene.SimChatBroadcast(Utils.StringToBytes(tideLevelMsg), ChatTypeEnum.Region, m_tideInfoChannel, m_shoutPos, "TIDE", UUID.Zero, false);
-                    m_scene.SimChatBroadcast(Utils.StringToBytes(m_tideLevel.ToString()), ChatTypeEnum.Region, m_tideLevelChannel, m_shoutPos, "TIDE", UUID.Zero, false);
-                }
-            }
+            if (m_tideInfoDebug) m_log.InfoFormat("[TIDE]: Sea Level currently at {0}m in Region: {1}", m_tideLevel, m_scene.RegionInfo.RegionName);
 
+            if (m_tideInfoBroadcast && m_tideDirection)
+            {
+                m_scene.SimChatBroadcast(Utils.StringToBytes(tideLevelMsg), ChatTypeEnum.Region, m_tideInfoChannel, m_shoutPos, "TIDE", UUID.Zero, false);
+                m_scene.SimChatBroadcast(Utils.StringToBytes(m_tideLevel.ToString()), ChatTypeEnum.Region, m_tideLevelChannel, m_shoutPos, "TIDE", UUID.Zero, false);
+            }   
+            if (m_tideInfoDebug) m_log.InfoFormat("[TIDE]: Updating Region: {0}", m_scene.RegionInfo.RegionName);
+
+            m_scene.RegionInfo.RegionSettings.WaterHeight = m_tideLevel;
+            m_scene.EventManager.TriggerRequestChangeWaterHeight(m_tideLevel);
+            m_scene.EventManager.TriggerTerrainTick();
+            
+            if (m_tideInfoBroadcast && !m_tideDirection)
+            {
+                m_scene.SimChatBroadcast(Utils.StringToBytes(tideLevelMsg), ChatTypeEnum.Region, m_tideInfoChannel, m_shoutPos, "TIDE", UUID.Zero, false);
+                m_scene.SimChatBroadcast(Utils.StringToBytes(m_tideLevel.ToString()), ChatTypeEnum.Region, m_tideLevelChannel, m_shoutPos, "TIDE", UUID.Zero, false);
+            }
         }
         #endregion
     }
