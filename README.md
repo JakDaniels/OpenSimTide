@@ -17,40 +17,40 @@ each region using the [Region Name] section heading.
 
 Here is an example config:
 
-[Test Region 1]
+	[Test Region 1]
 
-	;# {TideEnabled} {} {Enable the tide to come in and out?} {true false} false
-	;; Tides currently only work on single regions and varregions (non megaregions) 
-	;# surrounded completely by water
-	;; Anything else will produce wierd results where you may see a big
-	;; vertical 'step' in the ocean
+		;# {TideEnabled} {} {Enable the tide to come in and out?} {true false} false
+		;; Tides currently only work on single regions and varregions (non megaregions) 
+		;# surrounded completely by water
+		;; Anything else will produce wierd results where you may see a big
+		;; vertical 'step' in the ocean
 
-	TideEnabled = True
+		TideEnabled = True
 
-	;; update the tide every x simulator frames
-	TideUpdateRate = 50
+		;; update the tide every x simulator frames
+		TideUpdateRate = 50
 
-	;; low and high water marks in metres
-	TideLowWater = 17.0
-	TideHighWater = 20.0
+		;; low and high water marks in metres
+		TideLowWater = 17.0
+		TideHighWater = 20.0
 
-	;; how long in seconds for a complete cycle time low->high->low et
-	TideCycleTime = 900
+		;; how long in seconds for a complete cycle time low->high->low et
+		TideCycleTime = 900
 
-	;; provide tide information on the console?
-	TideInfoDebug = False
+		;; provide tide information on the console?
+		TideInfoDebug = False
 
-	;; chat tide info to the whole region?
-	TideInfoBroadcast = True
+		;; chat tide info to the whole region?
+		TideInfoBroadcast = True
 
-	;; which channel to region chat on for the full tide info
-	TideInfoChannel = 5555
+		;; which channel to region chat on for the full tide info
+		TideInfoChannel = 5555
 
-	;; which channel to region chat on for just the tide level in metres
-	TideLevelChannel = 5556
+		;; which channel to region chat on for just the tide level in metres
+		TideLevelChannel = 5556
 
-	;; How many times to repeat Tide Warning messages at high/low tide
-	TideAnnounceCount = 5
+		;; How many times to repeat Tide Warning messages at high/low tide
+		TideAnnounceCount = 5
 
 
 To add this module to your OpenSim, cd to your addon-modules directory and type:
