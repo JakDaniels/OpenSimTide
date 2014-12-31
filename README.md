@@ -8,12 +8,13 @@ If you are running multiple regions on one simulator you can have different tide
 settings per region in the configuration file, in the exact same way you can
 customize per Region setting in Regions.ini
 
-The configuration file for this module is in:
+The configuration file for this module should be placed in:
 
-addon-modules/OpenSimTide/config/OpenSimTide.ini
+bin/addon-modules/OpenSimTide/config/OpenSimTide.ini
 
-and follows the same format as a Regions.ini file, where you specify setting for
-each region using the [Region Name] section heading.
+and follows the similar format as a Regions.ini file, where you specify settings for
+each region using the [Region Name] section heading. There is an example .ini file
+provided which should be edited and copied to the correct place above.
 
 Here is an example config:
 
@@ -58,6 +59,7 @@ To add this module to your OpenSim, cd to your addon-modules directory and type:
 git clone https://github.com/JakDaniels/OpenSimTide.git
 
 Rerun the prebuild script in the main opensim directory and rebuild with xbuild or nant.
+Remember you need an .ini file in bin/addon-modules/OpenSimTide/config/
 
 How do I use the tide data in scripts?
 Here is an example script. Rez a spherical prim above the water and place this script in it.

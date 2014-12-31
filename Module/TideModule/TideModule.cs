@@ -14,7 +14,7 @@ using OpenMetaverse;
 using Mono.Addins;
 
 [assembly: Addin("OpenSimTide", "0.2")]
-[assembly: AddinDependency("OpenSim", "0.5")]
+[assembly: AddinDependency("OpenSim.Region.Framework", OpenSim.VersionInfo.VersionNumber)]
 
 namespace TideModule
 {
@@ -78,25 +78,11 @@ namespace TideModule
         public void AddRegion (Scene scene)
         {
             m_log.InfoFormat("[{0}]: Adding region '{1}' to this module", m_name, scene.RegionInfo.RegionName);
-            
-            string moduleConfigFile = Path.Combine(Util.configDir(), "../addon-modules/" + m_name + "/config/" + m_name + ".ini");
-            m_log.InfoFormat("[{0}]: Loading from config file {1}", m_name, moduleConfigFile);
-            try
-            {
-                m_config = new IniConfigSource(moduleConfigFile);
-            }
-            catch (Exception )
-            {
-                m_log.InfoFormat("[{0}]: No module config file '{1}' was found! Tide in this region is set to Disabled", m_name, moduleConfigFile);
-                m_enabled = false;
-                m_config = null;
-                return;
-            }
             IConfig cnf = m_config.Configs[scene.RegionInfo.RegionName];
             
             if(cnf == null)
             {
-                m_log.InfoFormat("[{0}]: No region section [{1}] found in config file {2}. Tide in this region is set to Disabled", m_name, scene.RegionInfo.RegionName, moduleConfigFile);
+                m_log.InfoFormat("[{0}]: No region section [{1}] found in configuration. Tide in this region is set to Disabled", m_name, scene.RegionInfo.RegionName);
                 m_enabled = false;
                 return;
             }
