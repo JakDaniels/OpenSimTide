@@ -82,9 +82,19 @@ namespace TideModule
             
             if(cnf == null)
             {
-                m_log.InfoFormat("[{0}]: No region section [{1}] found in configuration. Tide in this region is set to Disabled", m_name, scene.RegionInfo.RegionName);
-                m_enabled = false;
-                return;
+                m_log.InfoFormat("[{0}]: No region section [{1}] found in main configuration.", m_name, scene.RegionInfo.RegionName);
+                string filename = m_name + ".ini";
+                if (File.Exists(filename))
+                {
+                    IniConfigSource source = new IniConfigSource(filename);
+                    cnf = source.Configs[scene.RegionInfo.RegionName];
+                    if (cnf == null)
+                    {
+                        m_log.InfoFormat("[{0}]: No region section [{1}] found in configuration {2}. Tide in this region is set to Disabled", m_name, scene.RegionInfo.RegionName, filename);
+                        m_enabled = false;
+                        return;
+                    }
+                }
             }
               
             m_enabled = cnf.GetBoolean("TideEnabled", false);
