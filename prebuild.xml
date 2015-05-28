@@ -8,6 +8,8 @@
      <Configuration name="Release">
        <Options>
          <OutputPath>../../../bin/</OutputPath>
+         <OptimizeCode>true</OptimizeCode>
+         <DebugInformation>false</DebugInformation>
        </Options>
      </Configuration>
 

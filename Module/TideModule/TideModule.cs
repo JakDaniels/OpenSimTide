@@ -30,6 +30,7 @@ namespace TideModule
         private const int TICKS_PER_SECOND = 10000000;
 
         public string m_name = "OpenSimTide";
+        private string m_regionConfigDir = "";
         private uint m_frame = 0;
         private int m_frameUpdateRate = 100;
         private bool m_enabled = false;
@@ -77,23 +78,35 @@ namespace TideModule
 
         public void AddRegion (Scene scene)
         {
+            IConfig cnf;
             m_log.InfoFormat("[{0}]: Adding region '{1}' to this module", m_name, scene.RegionInfo.RegionName);
-            IConfig cnf = m_config.Configs[scene.RegionInfo.RegionName];
+
+            cnf = m_config.Configs["Startup"];
+            m_regionConfigDir = cnf.GetString("regionload_regionsdir", Path.Combine(Util.configDir(), "bin/Regions/"));
+
+            cnf = m_config.Configs[scene.RegionInfo.RegionName];
             
             if(cnf == null)
             {
-                m_log.InfoFormat("[{0}]: No region section [{1}] found in main configuration.", m_name, scene.RegionInfo.RegionName);
-                string filename = m_name + ".ini";
-                if (File.Exists(filename))
+                m_log.InfoFormat("[{0}]: No region section [{1}] found in addon-modules/{2}/config/*.ini configuration files.", m_name, scene.RegionInfo.RegionName, m_name);
+                //string moduleConfigFile = Path.Combine(Util.configDir(),m_name + ".ini");
+                string moduleConfigFile = Path.Combine(m_regionConfigDir, "Regions.ini");
+                try
                 {
-                    IniConfigSource source = new IniConfigSource(filename);
-                    cnf = source.Configs[scene.RegionInfo.RegionName];
-                    if (cnf == null)
-                    {
-                        m_log.InfoFormat("[{0}]: No region section [{1}] found in configuration {2}. Tide in this region is set to Disabled", m_name, scene.RegionInfo.RegionName, filename);
-                        m_enabled = false;
-                        return;
-                    }
+                    m_log.InfoFormat("[{0}]: Checking {1} for [{2}] section containing valid config keys", m_name, moduleConfigFile, scene.RegionInfo.RegionName);
+                    m_config = new IniConfigSource(moduleConfigFile);
+                    cnf = m_config.Configs[scene.RegionInfo.RegionName];
+                }
+                catch (Exception)
+                {
+                    cnf = null;
+                }
+                    
+                if (cnf == null)
+                {
+                    m_log.InfoFormat("[{0}]: No region section [{1}] found in configuration {2}. Tide in this region is set to Disabled", m_name, scene.RegionInfo.RegionName, moduleConfigFile);
+                    m_enabled = false;
+                    return;
                 }
             }
               
